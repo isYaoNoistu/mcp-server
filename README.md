@@ -1,17 +1,17 @@
-# MCP Server（Dify & Cherry Studio 双兼容）
+# MCP Server（接入 Dify & Cherry Studio）
 
 ## 项目简介
 
-本项目是一个 **MCP（Model Context Protocol）Server**，基于 **FastAPI + JSON-RPC 2.0** 实现，最初用于 **Dify 平台** 的 MCP 工具对接，在**不破坏原有核心逻辑的前提下**，通过结构化改造，实现：
+本项目是一个 **MCP（Model Context Protocol）Server**，基于 **FastAPI + JSON-RPC 2.0** 实现，最初用于 **Dify 平台** 的 MCP 工具对接，在**不破坏原有核心逻辑的前提下**，通过结构化改造，实现兼容Cherry Studio。
 
 - ✅ **完整兼容 Dify MCP 接入规范**
 - ✅ **同时支持 Cherry Studio 的 JSON 导入方式**
 - ✅ **工具（Tools）模块化、可扩展**
 - ✅ **单一 Server，双平台复用（二合一）**
 
-当前已内置示例工具：
+当前已内置工具：
 
-- `read_linux_yaml`：读取 Prometheus Linux 规则 YAML 文件
+- `read_files`：读取指定的系统文件文件。
 
 ------
 
@@ -53,11 +53,11 @@ mcp-server/
 │
 ├── tools/                     # MCP 工具目录（重点）
 │   ├── __init__.py
-│   └── read_linux_yaml.py     # 查询Linux文件的mcp工具
+│   └── read_files.py          # 查询Linux文件的mcp工具
 │
 ├── cherry/                    # Cherry Studio 专用
 │   ├── cherry_mcp.json        # Cherry Studio 导入配置
-│   └── export.py              # 工具 → Cherry JSON 转换（可选）
+│
 │
 └── scripts/
     └── run.sh                 # 启动脚本
@@ -113,12 +113,12 @@ def call_tool(name, params):
 
 #### 每个工具一个文件
 
-以 `read_linux_yaml.py` 为例：
+以 `read_files.py` 为例：
 
 ```python
-class ReadLinuxYAMLTool:
-    name = "read_linux_yaml"
-    description = "Read Prometheus Linux rule YAML"
+class ReadFilesTool:
+    name = "read_files"
+    description = "Read files"
     input_schema = {
         "type": "object",
         "properties": {},
@@ -146,18 +146,18 @@ Cherry Studio 使用 **JSON 描述 MCP 工具**，示例：
   "name": "linux-yaml-reader",
   "type": "mcp",
   "transport": "http",
-  "endpoint": "http://YOUR_SERVER_IP:8000/mcp",
+  "endpoint": "http://127.0.0.1:8000/mcp",
   "tools": [
     {
-      "name": "read_linux_yaml",
-      "description": "Read Prometheus Linux rule YAML",
+      "name": "Read_Files",
+      "description": "Read Files",
       "input_schema": {}
     }
   ]
 }
 ```
 
-📌 **这个文件是 Cherry Studio 唯一需要的东西**
+📌 **这个文件是 Cherry Studio 唯一需要的东西，通过json文件导入mcp配置。**
 
 ------
 
@@ -205,10 +205,3 @@ http://0.0.0.0:8000/mcp
 ## 总结一句话
 
 > **这是一个以 Dify 为核心、Cherry Studio 为兼容目标的工程化 MCP Server，实现了“一次开发，多平台复用”。**
-
-
-~~~
-git add .
-git commit -m ""
-git push origin main
-~~~
