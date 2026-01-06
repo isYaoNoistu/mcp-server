@@ -2,7 +2,7 @@
 from fastapi import FastAPI, Request, Response
 import uvicorn
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 
 from core.protocol import jsonrpc_response, jsonrpc_error
 from core.state import MCPServerState
@@ -19,21 +19,29 @@ load_tools()
 
 @app.post("/mcp")
 async def mcp_handler(request: Request):
-    body = await request.json()
+    # 尽量在入口处捕获解析错误并返回 JSON-RPC parse error
+    try:
+        body = await request.json()
+    except Exception:
+        logger.warning("Failed to parse request JSON")
+        # id unknown -> null in JSON-RPC error
+        return jsonrpc_error(None, -32700, "Parse error: invalid JSON")
+
     method = body.get("method")
     request_id = body.get("id")
 
-    # -------- Notification --------
-    if method == "notifications/initialized":
-        logger.info("MCP initialized notification received")
+    # Treat requests without id as notifications -> 204 No Content
+    if request_id is None:
+        logger.info(f"Notification received (method={method}) -> 204")
+        # optional handling of initialized notification
+        if method == "notifications/initialized":
+            MCPServerState.initialized = True
+            logger.info("Set MCPServerState.initialized = True from notification")
         return Response(status_code=204)
 
-    # -------- Base validation --------
-    if body.get("jsonrpc") != "2.0":
+    # Allow missing jsonrpc field: only error if present and not "2.0"
+    if "jsonrpc" in body and body.get("jsonrpc") != "2.0":
         return jsonrpc_error(request_id, -32600, "Invalid JSON-RPC version")
-
-    if request_id is None:
-        return jsonrpc_error(None, -32600, "id must not be null")
 
     logger.info(f"MCP method: {method}, id: {request_id}")
 
@@ -55,11 +63,7 @@ async def mcp_handler(request: Request):
 
     # -------- lifecycle guard --------
     if not MCPServerState.initialized:
-        return jsonrpc_error(
-            request_id,
-            -32002,
-            "Server not initialized"
-        )
+        return jsonrpc_error(request_id, -32002, "Server not initialized")
 
     # -------- tools/list --------
     if method == "tools/list":
@@ -67,8 +71,8 @@ async def mcp_handler(request: Request):
             "tools": [
                 {
                     "name": t.name,
-                    "description": t.description,
-                    "inputSchema": t.input_schema
+                    "description": getattr(t, "description", ""),
+                    "inputSchema": getattr(t, "input_schema", {})
                 }
                 for t in list_tools()
             ]
@@ -77,13 +81,14 @@ async def mcp_handler(request: Request):
     # -------- tools/call --------
     if method == "tools/call":
         params = body.get("params", {})
-        tool_name = params.get("name")
+        tool_name = params.get("name") if isinstance(params, dict) else None
 
         try:
-            result = call_tool(tool_name, params.get("arguments", {}))
+            result = call_tool(tool_name, params)
         except KeyError:
             return jsonrpc_error(request_id, -32601, "Tool not found")
 
+        # normalize result into content list expected by Dify
         return jsonrpc_response(request_id, {
             "content": [
                 {"type": "text", "text": result}
@@ -91,7 +96,6 @@ async def mcp_handler(request: Request):
             "isError": False
         })
 
-    from datetime import datetime, timezone
     # -------- ping --------
     if method == "ping":
         return jsonrpc_response(request_id, {
