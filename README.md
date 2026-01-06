@@ -1,4 +1,4 @@
-# MCP Server（接入 Dify & Cherry Studio）
+# 探索AIOps：MCP Server（接入 Dify & Cherry Studio）
 
 ## 项目简介
 
