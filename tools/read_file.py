@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
-FILE_PATH = r"D:\mcp-server\README.md"
+FILE_PATH = r"F:\学习资料\DevOps\阶段二-Prometheus+Grafana监控体系搭建.md"
 
 class ReadFilesTool:
     name = "read_file"

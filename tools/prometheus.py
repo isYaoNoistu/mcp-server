@@ -1,0 +1,183 @@
+# Prometheus query tool for mcp-server (uses a module-level constant for Prometheus URL)
+import re
+import requests
+from datetime import datetime, timezone, timedelta
+from typing import Any, Dict, List, Optional
+
+# <-- Set your Prometheus server URL here (single constant used by all calls) -->
+PROMETHEUS_API_URL = "http://120.48.58.4:9090"
+# ------------------------------------------------------------------------------
+
+class PrometheusTool:
+    name = "prometheus"
+    aliases = ["prometheus.query"]
+    description = "Query Prometheus metrics using PromQL (range query). Uses PROMETHEUS_API_URL constant."
+    input_schema = {
+        "type": "object",
+        "properties": {
+            "query": {"type": "string"},
+            "start_time": {"type": "string"},
+            "end_time": {"type": "string"},
+            "step": {"type": "string"},
+            "username": {"type": "string"},
+            "password": {"type": "string"},
+            "token": {"type": "string"}
+        },
+        "required": ["query"]
+    }
+
+    def run(self, params: Dict[str, Any]) -> str:
+        """
+        Run the Prometheus range query using PROMETHEUS_API_URL constant.
+        Returns a STRING (Markdown table on success, or 'Error: ...' string on failure).
+        """
+        try:
+            if not isinstance(params, dict):
+                return "Error: params must be a dict"
+
+            query = params.get("query")
+            if not query:
+                return "Error: missing required parameter: query"
+
+            start_time = params.get("start_time", "1h")
+            end_time = params.get("end_time", "now")
+            step = params.get("step", "15s")
+
+            username = params.get("username")
+            password = params.get("password")
+            token = params.get("token")
+
+            api_url = PROMETHEUS_API_URL.rstrip("/") if PROMETHEUS_API_URL else ""
+            if not api_url:
+                return "Error: PROMETHEUS_API_URL is not set in module"
+
+            headers = {}
+            auth = None
+            if username and password:
+                auth = (username, password)
+            elif token:
+                headers["Authorization"] = f"Bearer {token}"
+
+            start_iso = self._parse_time_to_iso(start_time)
+            end_iso = self._parse_time_to_iso(end_time)
+
+            url = f"{api_url}/api/v1/query_range"
+            params_req = {
+                "query": query,
+                "start": start_iso,
+                "end": end_iso,
+                "step": step
+            }
+
+            resp = requests.get(url, params=params_req, headers=headers, auth=auth, timeout=30)
+            if resp.status_code != 200:
+                return f"Error: query failed: HTTP {resp.status_code}, {resp.text}"
+
+            data = resp.json()
+            markdown = self._format_markdown_table_from_range(data)
+
+            # Return markdown (string). If you prefer JSON, serialize it to string here.
+            return markdown
+
+        except Exception as e:
+            return f"Error: exception: {str(e)}"
+
+    def _parse_time_to_iso(self, t: Optional[str]) -> str:
+        """
+        Convert time representations to RFC3339 / ISO8601 string acceptable by Prometheus.
+        Supported formats:
+          - "now" -> current UTC time
+          - relative like '1h', '30m', '15s', '2d', '1w', '1M', '1y'
+          - RFC3339/ISO string
+          - unix timestamp (int/float string)
+        """
+        if t is None:
+            t = "now"
+        t = str(t).strip()
+        if t.lower() == "now":
+            return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+        if re.fullmatch(r"^\d+(\.\d+)?$", t):
+            ts = float(t)
+            dt = datetime.fromtimestamp(ts, tz=timezone.utc)
+            return dt.isoformat().replace("+00:00", "Z")
+        m = re.fullmatch(r"^(\d+)([smhdwMy])$", t)
+        if m:
+            n = int(m.group(1))
+            unit = m.group(2)
+            now = datetime.utcnow().replace(tzinfo=timezone.utc)
+            if unit == "s":
+                dt = now - timedelta(seconds=n)
+            elif unit == "m":
+                dt = now - timedelta(minutes=n)
+            elif unit == "h":
+                dt = now - timedelta(hours=n)
+            elif unit == "d":
+                dt = now - timedelta(days=n)
+            elif unit == "w":
+                dt = now - timedelta(weeks=n)
+            elif unit == "M":
+                dt = now - timedelta(days=30 * n)
+            elif unit == "y":
+                dt = now - timedelta(days=365 * n)
+            else:
+                dt = now
+            return dt.isoformat().replace("+00:00", "Z")
+        try:
+            txt = t.replace("Z", "+00:00") if t.endswith("Z") else t
+            dt = datetime.fromisoformat(txt)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            dt = dt.astimezone(timezone.utc)
+            return dt.isoformat().replace("+00:00", "Z")
+        except Exception:
+            return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
+
+    def _format_markdown_table_from_range(self, resp_json: Dict[str, Any]) -> str:
+        """
+        Build a markdown table that shows for each timeseries (metric labels) the latest timestamp and value.
+        Returns a string (markdown).
+        """
+        if not resp_json or resp_json.get("status") != "success":
+            return "No data or query failed."
+
+        data = resp_json.get("data", {})
+        results = data.get("result", [])
+
+        label_keys = set()
+        for series in results:
+            metric = series.get("metric", {}) or {}
+            for k in metric.keys():
+                label_keys.add(k)
+        label_keys = sorted(list(label_keys))
+        header_cols = label_keys + ["value", "time"]
+
+        rows: List[Dict[str, str]] = []
+        for series in results:
+            metric = series.get("metric", {}) or {}
+            values = series.get("values") or series.get("value")
+            latest_time = ""
+            latest_value = ""
+            if isinstance(values, list) and values:
+                ts, val = values[-1]
+                latest_time = datetime.fromtimestamp(float(ts), tz=timezone.utc).isoformat().replace("+00:00", "Z")
+                latest_value = str(val)
+            row = {k: metric.get(k, "") for k in label_keys}
+            row["value"] = latest_value
+            row["time"] = latest_time
+            rows.append(row)
+
+        if not rows:
+            return "No series returned."
+
+        header_line = "| " + " | ".join(header_cols) + " |"
+        sep_line = "| " + " | ".join(["---"] * len(header_cols)) + " |"
+        row_lines = []
+        for r in rows:
+            row_lines.append("| " + " | ".join(r.get(c, "") for c in header_cols) + " |")
+
+        md = "\n".join([header_line, sep_line] + row_lines)
+        return md
+
+
+# module-level tool object required by mcp-server registry
+tool = PrometheusTool()

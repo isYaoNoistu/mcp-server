@@ -13,6 +13,8 @@
 
 - `read_file`：读取指定的系统文件文件。
 
+- `prometheus`：基于dify-plugin-prometheus二次开发，仅保留AI调用Prometheus功能，移除kubernetes逻辑。
+
 ------
 
 ## 设计原则
@@ -54,6 +56,7 @@ mcp-server/
 ├── tools/                     # MCP 工具目录（重点）
 │   ├── __init__.py
 │   └── read_files.py          # 查询Linux文件的mcp工具
+│   └── prometheus.py          # 查询Prometheus的mcp工具
 │
 ├── cherry/                    # Cherry Studio 专用
 │   ├── cherry_mcp.json        # Cherry Studio 导入配置
