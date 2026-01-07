@@ -1,24 +1,24 @@
-# Prometheus query tool for mcp-server (uses module-level constants for Prometheus URL and credentials)
-# Exports a module-level `tool` object (compatible with mcp-server registry)
-# This version ALWAYS returns a string from run() to ensure compatibility with Dify/Cherry Studio.
+# 适用于mcp-server的Prometheus查询工具（使用模块级常量配置Prometheus地址和认证信息）
+# 导出模块级别的`tool`对象（兼容mcp-server的工具注册机制）
+# 此版本的run()方法始终返回字符串，确保与Dify/Cherry Studio兼容。
 
 import re
 import requests
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 
-# 填写Prometheus连接信息 无需验证则留空
-# <-- Configure Prometheus connection here -->
-PROMETHEUS_API_URL = "http://127.0.0.1:9090"   # change to your Prometheus URL
-PROMETHEUS_USERNAME = ""                       # set username here (leave empty for no basic-auth)
-PROMETHEUS_PASSWORD = ""                       # set password here (leave empty for no basic-auth)
-PROMETHEUS_TOKEN = ""                          # optional: set bearer token here (leave empty if unused)
+# 填写Prometheus连接信息 无需认证则留空
+# <-- 在此配置Prometheus连接信息 -->
+PROMETHEUS_API_URL = "http://127.0.0.1:9090"   # 改为你的Prometheus地址
+PROMETHEUS_USERNAME = ""                       # 在此设置用户名（无需基础认证则留空）
+PROMETHEUS_PASSWORD = ""                       # 在此设置密码（无需基础认证则留空）
+PROMETHEUS_TOKEN = ""                          # 可选：在此设置Bearer Token（未使用则留空）
 # ------------------------------------------------------------------------------
 
 class PrometheusTool:
     name = "prometheus"
     aliases = ["prometheus.query"]
-    description = "Query Prometheus metrics using PromQL (range query). Uses module-level PROMETHEUS_* constants."
+    description = "使用PromQL查询Prometheus指标（范围查询）。使用模块级别的PROMETHEUS_*常量配置连接信息。"
     input_schema = {
         "type": "object",
         "properties": {
@@ -35,13 +35,13 @@ class PrometheusTool:
 
     def run(self, params: Dict[str, Any]) -> str:
         """
-        Run the Prometheus range query using PROMETHEUS_API_URL and optional credential constants.
-        Returns a STRING (Markdown table on success, or 'Error: ...' string on failure).
-        Credential resolution order:
-          1) params['username']/params['password'] or params['token'] if provided in call
-          2) PROMETHEUS_USERNAME / PROMETHEUS_PASSWORD
-          3) PROMETHEUS_TOKEN
-          If credentials are empty, the request is made without auth.
+        使用PROMETHEUS_API_URL和可选的认证常量执行Prometheus范围查询。
+        返回字符串（成功时返回Markdown表格，失败时返回'Error: ...'格式的错误字符串）。
+        认证信息解析优先级：
+          1) 调用时传入的params['username']/params['password'] 或 params['token']（如果提供）
+          2) 模块级常量PROMETHEUS_USERNAME / PROMETHEUS_PASSWORD
+          3) 模块级常量PROMETHEUS_TOKEN
+          若所有认证信息均为空，则发起无认证的请求。
         """
         try:
             if not isinstance(params, dict):
@@ -55,7 +55,7 @@ class PrometheusTool:
             end_time = params.get("end_time", "now")
             step = params.get("step", "15s")
 
-            # Credential resolution: prefer per-call params, fall back to module constants
+            # 认证信息解析：优先使用调用时传入的参数，其次使用模块常量
             username = params.get("username") if params.get("username") is not None else PROMETHEUS_USERNAME or None
             password = params.get("password") if params.get("password") is not None else PROMETHEUS_PASSWORD or None
             token = params.get("token") if params.get("token") is not None else PROMETHEUS_TOKEN or None
@@ -66,8 +66,8 @@ class PrometheusTool:
 
             headers = {}
             auth = None
-            # If username/password present, use basic auth (requests auth tuple).
-            # Else if token present, use Bearer token header.
+            # 如果提供了用户名/密码，使用基础认证（requests的auth元组）
+            # 否则如果有token，使用Bearer Token请求头
             if username and password:
                 auth = (username, password)
             elif token:
@@ -98,12 +98,12 @@ class PrometheusTool:
 
     def _parse_time_to_iso(self, t: Optional[str]) -> str:
         """
-        Convert time representations to RFC3339 / ISO8601 string acceptable by Prometheus.
-        Supported formats:
-          - "now" -> current UTC time
-          - relative like '1h', '30m', '15s', '2d', '1w', '1M', '1y'
-          - RFC3339/ISO string
-          - unix timestamp (int/float string)
+        将时间表示形式转换为Prometheus可接受的RFC3339 / ISO8601格式字符串。
+        支持的格式：
+          - "now" -> 当前UTC时间
+          - 相对时间，如'1h'（1小时前）、'30m'（30分钟前）、'15s'（15秒前）、'2d'（2天前）、'1w'（1周前）、'1M'（1个月前）、'1y'（1年前）
+          - RFC3339/ISO格式字符串
+          - Unix时间戳（整数/浮点数格式的字符串）
         """
         if t is None:
             t = "now"
@@ -148,8 +148,8 @@ class PrometheusTool:
 
     def _format_markdown_table_from_range(self, resp_json: Dict[str, Any]) -> str:
         """
-        Build a markdown table that shows for each timeseries (metric labels) the latest timestamp and value.
-        Returns a string (markdown).
+        构建Markdown表格，展示每个时间序列（指标标签）的最新时间戳和数值。
+        返回字符串（Markdown格式）。
         """
         if not resp_json or resp_json.get("status") != "success":
             return "No data or query failed."
@@ -193,5 +193,5 @@ class PrometheusTool:
         return md
 
 
-# module-level tool object required by mcp-server registry
+# 模块级别的tool对象，供mcp-server的工具注册器使用
 tool = PrometheusTool()
