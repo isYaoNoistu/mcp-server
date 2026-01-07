@@ -11,11 +11,13 @@
 
 当前已内置工具：
 
-- `read_file`：(已实现)读取指定的系统文件文件。
+- `read_file`：读取指定的系统文件文件（初期测试使用）。
 
 - `prometheus`：基于dify-plugin-prometheus二次开发，仅保留AI调用Prometheus功能，移除kubernetes逻辑。
 
-- `log_query`：(下一步计划)定义AI可以访问的目录，该目录下所有日志可查看。
+- `files_query`：定义可以访问的目录，该目录下所有文件可查看。
+
+- `system_check`：定义一部分常用系统运维命令，AI可调用命令查询系统状态等等。
 ------
 
 ## 设计原则
