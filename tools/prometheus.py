@@ -5,7 +5,7 @@ from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 
 # <-- Set your Prometheus server URL here (single constant used by all calls) -->
-PROMETHEUS_API_URL = "http://120.48.58.4:9090"
+PROMETHEUS_API_URL = "http://127.0.0.1:9090"
 # ------------------------------------------------------------------------------
 
 class PrometheusTool:
