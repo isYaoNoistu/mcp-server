@@ -1,17 +1,24 @@
-# Prometheus query tool for mcp-server (uses a module-level constant for Prometheus URL)
+# Prometheus query tool for mcp-server (uses module-level constants for Prometheus URL and credentials)
+# Exports a module-level `tool` object (compatible with mcp-server registry)
+# This version ALWAYS returns a string from run() to ensure compatibility with Dify/Cherry Studio.
+
 import re
 import requests
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 
-# <-- Set your Prometheus server URL here (single constant used by all calls) -->
-PROMETHEUS_API_URL = "http://127.0.0.1:9090"
+# 填写Prometheus连接信息 无需验证则留空
+# <-- Configure Prometheus connection here -->
+PROMETHEUS_API_URL = "http://127.0.0.1:9090"   # change to your Prometheus URL
+PROMETHEUS_USERNAME = ""                       # set username here (leave empty for no basic-auth)
+PROMETHEUS_PASSWORD = ""                       # set password here (leave empty for no basic-auth)
+PROMETHEUS_TOKEN = ""                          # optional: set bearer token here (leave empty if unused)
 # ------------------------------------------------------------------------------
 
 class PrometheusTool:
     name = "prometheus"
     aliases = ["prometheus.query"]
-    description = "Query Prometheus metrics using PromQL (range query). Uses PROMETHEUS_API_URL constant."
+    description = "Query Prometheus metrics using PromQL (range query). Uses module-level PROMETHEUS_* constants."
     input_schema = {
         "type": "object",
         "properties": {
@@ -28,8 +35,13 @@ class PrometheusTool:
 
     def run(self, params: Dict[str, Any]) -> str:
         """
-        Run the Prometheus range query using PROMETHEUS_API_URL constant.
+        Run the Prometheus range query using PROMETHEUS_API_URL and optional credential constants.
         Returns a STRING (Markdown table on success, or 'Error: ...' string on failure).
+        Credential resolution order:
+          1) params['username']/params['password'] or params['token'] if provided in call
+          2) PROMETHEUS_USERNAME / PROMETHEUS_PASSWORD
+          3) PROMETHEUS_TOKEN
+          If credentials are empty, the request is made without auth.
         """
         try:
             if not isinstance(params, dict):
@@ -43,9 +55,10 @@ class PrometheusTool:
             end_time = params.get("end_time", "now")
             step = params.get("step", "15s")
 
-            username = params.get("username")
-            password = params.get("password")
-            token = params.get("token")
+            # Credential resolution: prefer per-call params, fall back to module constants
+            username = params.get("username") if params.get("username") is not None else PROMETHEUS_USERNAME or None
+            password = params.get("password") if params.get("password") is not None else PROMETHEUS_PASSWORD or None
+            token = params.get("token") if params.get("token") is not None else PROMETHEUS_TOKEN or None
 
             api_url = PROMETHEUS_API_URL.rstrip("/") if PROMETHEUS_API_URL else ""
             if not api_url:
@@ -53,6 +66,8 @@ class PrometheusTool:
 
             headers = {}
             auth = None
+            # If username/password present, use basic auth (requests auth tuple).
+            # Else if token present, use Bearer token header.
             if username and password:
                 auth = (username, password)
             elif token:
@@ -76,7 +91,6 @@ class PrometheusTool:
             data = resp.json()
             markdown = self._format_markdown_table_from_range(data)
 
-            # Return markdown (string). If you prefer JSON, serialize it to string here.
             return markdown
 
         except Exception as e:
