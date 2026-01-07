@@ -1,24 +1,18 @@
-# 适用于mcp-server的Prometheus查询工具（使用模块级常量配置Prometheus地址和认证信息）
-# 导出模块级别的`tool`对象（兼容mcp-server的工具注册机制）
-# 此版本的run()方法始终返回字符串，确保与Dify/Cherry Studio兼容。
+# Prometheus query tool for mcp-server (reads configuration from root .env via tools.config)
+# Exports a module-level `tool` object compatible with mcp-server registry.
+# Returns STRING (Markdown or Error: ...) for Dify/Cherry compatibility.
 
 import re
 import requests
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional
 
-# 填写Prometheus连接信息 无需认证则留空
-# <-- 在此配置Prometheus连接信息 -->
-PROMETHEUS_API_URL = "http://127.0.0.1:9090"   # 改为你的Prometheus地址
-PROMETHEUS_USERNAME = ""                       # 在此设置用户名（无需基础认证则留空）
-PROMETHEUS_PASSWORD = ""                       # 在此设置密码（无需基础认证则留空）
-PROMETHEUS_TOKEN = ""                          # 可选：在此设置Bearer Token（未使用则留空）
-# ------------------------------------------------------------------------------
+from tools.config import get as cfg_get
 
 class PrometheusTool:
     name = "prometheus"
     aliases = ["prometheus.query"]
-    description = "使用PromQL查询Prometheus指标（范围查询）。使用模块级别的PROMETHEUS_*常量配置连接信息。"
+    description = "Query Prometheus metrics using PromQL (range query). Configured via root .env."
     input_schema = {
         "type": "object",
         "properties": {
@@ -35,13 +29,11 @@ class PrometheusTool:
 
     def run(self, params: Dict[str, Any]) -> str:
         """
-        使用PROMETHEUS_API_URL和可选的认证常量执行Prometheus范围查询。
-        返回字符串（成功时返回Markdown表格，失败时返回'Error: ...'格式的错误字符串）。
-        认证信息解析优先级：
-          1) 调用时传入的params['username']/params['password'] 或 params['token']（如果提供）
-          2) 模块级常量PROMETHEUS_USERNAME / PROMETHEUS_PASSWORD
-          3) 模块级常量PROMETHEUS_TOKEN
-          若所有认证信息均为空，则发起无认证的请求。
+        Run the Prometheus range query.
+        Credential / URL resolution order:
+          1) Per-call params (params.username/password or params.token)
+          2) Values from .env (PROMETHEUS_USERNAME / PROMETHEUS_PASSWORD / PROMETHEUS_TOKEN)
+        .env should contain PROMETHEUS_API_URL (required) and optionally credentials.
         """
         try:
             if not isinstance(params, dict):
@@ -55,19 +47,19 @@ class PrometheusTool:
             end_time = params.get("end_time", "now")
             step = params.get("step", "15s")
 
-            # 认证信息解析：优先使用调用时传入的参数，其次使用模块常量
-            username = params.get("username") if params.get("username") is not None else PROMETHEUS_USERNAME or None
-            password = params.get("password") if params.get("password") is not None else PROMETHEUS_PASSWORD or None
-            token = params.get("token") if params.get("token") is not None else PROMETHEUS_TOKEN or None
-
-            api_url = PROMETHEUS_API_URL.rstrip("/") if PROMETHEUS_API_URL else ""
+            # Resolve URL: prefer params, fall back to .env
+            api_url = (params.get("api_url") or cfg_get("PROMETHEUS_API_URL") or "").strip()
             if not api_url:
-                return "Error: PROMETHEUS_API_URL is not set in module"
+                return "Error: PROMETHEUS_API_URL not configured in .env (or passed in params)"
+            api_url = api_url.rstrip("/")
+
+            # Resolve credentials: per-call overrides .env
+            username = params.get("username") if params.get("username") is not None else cfg_get("PROMETHEUS_USERNAME") or None
+            password = params.get("password") if params.get("password") is not None else cfg_get("PROMETHEUS_PASSWORD") or None
+            token = params.get("token") if params.get("token") is not None else cfg_get("PROMETHEUS_TOKEN") or None
 
             headers = {}
             auth = None
-            # 如果提供了用户名/密码，使用基础认证（requests的auth元组）
-            # 否则如果有token，使用Bearer Token请求头
             if username and password:
                 auth = (username, password)
             elif token:
@@ -147,10 +139,6 @@ class PrometheusTool:
             return datetime.utcnow().replace(tzinfo=timezone.utc).isoformat().replace("+00:00", "Z")
 
     def _format_markdown_table_from_range(self, resp_json: Dict[str, Any]) -> str:
-        """
-        构建Markdown表格，展示每个时间序列（指标标签）的最新时间戳和数值。
-        返回字符串（Markdown格式）。
-        """
         if not resp_json or resp_json.get("status") != "success":
             return "No data or query failed."
 
@@ -192,6 +180,4 @@ class PrometheusTool:
         md = "\n".join([header_line, sep_line] + row_lines)
         return md
 
-
-# 模块级别的tool对象，供mcp-server的工具注册器使用
 tool = PrometheusTool()
