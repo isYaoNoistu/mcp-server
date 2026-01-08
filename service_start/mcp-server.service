@@ -1,0 +1,24 @@
+# 测试环境使用
+[Unit]
+Description=MCP Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/data/project/mcp-server
+ExecStart=/data/project/mcp-server/.venv/bin/python /data/project/mcp-server/mcp_server.py
+Restart=on-failure
+RestartSec=5s
+Environment=PYTHONUNBUFFERED=1
+StandardOutput=append:/data/project/mcp-server/logs/mcp-server.log
+StandardError=append:/data/project/mcp-server/logs/mcp-server.log
+ExecStartPre=/bin/mkdir -p /data/project/mcp-server/logs
+
+[Install]
+WantedBy=multi-user.target
+
+# systemd 管理mcp-server 路径自定义即可
+# systemctl daemon-reload# 2. 重启服务
+# systemctl restart mcp-server.service

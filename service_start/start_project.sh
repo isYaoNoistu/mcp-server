@@ -4,6 +4,8 @@
 # 要求：Linux+systemd、Python≥3.10
 # 使用：chmod +x start_project.sh && ./start_project.sh
 
+# 暂不使用他来启动服务，可用于补充环境依赖
+
 set -euo pipefail
 
 # 颜色输出定义
@@ -119,49 +121,5 @@ fi
 # 依赖
 pip install uvicorn fastapi
 
-# 步骤7：创建并启动systemd服务
-SERVICE_NAME="mcp-server.service"
-SERVICE_PATH="/etc/systemd/system/$SERVICE_NAME"
-EXEC_START="$VENV_PY $PROJECT_DIR/mcp_server.py"
 
-if command -v systemctl >/dev/null 2>&1; then
-  SERVICE_UNIT="[Unit]
-Description=mcp-server 服务
-After=network.target
-
-[Service]
-Type=simple
-User=${INVOKER_USER}
-WorkingDirectory=${PROJECT_DIR}
-ExecStart=${EXEC_START}
-Restart=on-failure
-RestartSec=5s
-Environment=PYTHONUNBUFFERED=1
-
-[Install]
-WantedBy=multi-user.target"
-
-  info "创建systemd服务文件：$SERVICE_PATH..."
-  TMP_UNIT="$(mktemp)"
-  printf "%s" "$SERVICE_UNIT" > "$TMP_UNIT"
-  SUDO="[ $(id -u) -ne 0 ] && echo sudo"
-  eval $SUDO mv "$TMP_UNIT" "$SERVICE_PATH"
-  eval $SUDO chown root:root "$SERVICE_PATH"
-  eval $SUDO chmod 644 "$SERVICE_PATH"
-
-  info "重载systemd配置..."
-  eval $SUDO systemctl daemon-reload
-  info "启用并启动服务：$SERVICE_NAME..."
-  eval $SUDO systemctl enable --now "$SERVICE_NAME"
-
-  info "服务状态："
-  eval $SUDO systemctl status --no-pager "$SERVICE_NAME" || true
-else
-  warn "无systemctl，跳过服务创建"
-  info "手动启动命令：$EXEC_START"
-fi
-
-info "==================== 初始化完成 ===================="
-info "虚拟环境：$VENV_DIR | 服务名：$SERVICE_NAME"
-info "日志查看：sudo journalctl -u $SERVICE_NAME -f"
-info "服务重启：sudo systemctl restart $SERVICE_NAME"
+echo "基础环境准备完毕，请配置systemd文件"
