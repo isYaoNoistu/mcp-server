@@ -1,4 +1,4 @@
-# 探索AIOps：MCP Server（接入 Dify & Cherry Studio）
+# 探索AIOps：MCP Server（接入 Cherry Studio & Dify）
 
 ## 项目简介
 
@@ -59,14 +59,12 @@ mcp-server/
 ├── tools/                     # MCP 工具目录（重点）
 │   ├── __init__.py
 │   └── read_files.py          # 查询Linux文件的mcp工具
-│   └── prometheus.py          # 查询Prometheus的mcp工具
+│   └── prometheus_tools.py    # 查询Prometheus的mcp工具
+│   └── files_query.py         # 文件查询的mcp工具
+│   └── command_tools.py       # 常用系统检查命令的mcp工具
 │
-├── cherry/                    # Cherry Studio 专用
-│   ├── cherry_mcp.json        # Cherry Studio 导入配置
-│
-│
-└── scripts/
-    └── run.sh                 # 启动脚本
+└── cherry/                    # Cherry Studio 专用
+    └── cherry_mcp.json        # Cherry Studio 导入配置 
 ```
 
 ------
