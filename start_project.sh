@@ -12,7 +12,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-# 国内PyPI源配置（主源：清华，兜底：阿里云）
+# 国内PyPI源配置
 PYPI_MIRROR_MAIN="https://pypi.tuna.tsinghua.edu.cn/simple/"
 PYPI_MIRROR_FALLBACK="https://mirrors.aliyun.com/pypi/simple/"
 
@@ -115,6 +115,9 @@ if [ -f "$REQ_FILE" ]; then
 else
   warn "无requirements.txt，跳过依赖安装"
 fi
+
+# 依赖
+pip install uvicorn fastapi
 
 # 步骤7：创建并启动systemd服务
 SERVICE_NAME="mcp-server.service"

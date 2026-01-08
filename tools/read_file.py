@@ -19,4 +19,4 @@ class ReadFilesTool:
             return f.read()
 
 
-tool = ReadFilesTool()
+# tool = ReadFilesTool()
