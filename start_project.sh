@@ -120,6 +120,7 @@ fi
 
 # 依赖
 pip install uvicorn fastapi
-
+pip install pymysql
+pip install mysql-connector-python
 
 echo "基础环境准备完毕，请配置systemd文件"
