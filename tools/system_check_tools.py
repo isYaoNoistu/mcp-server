@@ -1,7 +1,7 @@
 # command_tools.py
 # 四个相关的工具合并在同一模块中并导出：system_status / process_check / container_check / service_check
 #
-# 模块总体说明（中文）：
+# 模块总体说明：
 # - 提供一组受控、可被 AI 调用的系统检测命令，分为四类：
 #   1) system_status: 系统基础信息（uname, hostname, lsb_release, uptime）
 #   2) process_check: 进程与 CPU/内存 排查（top, ps, mpstat, free, vmstat）
@@ -11,7 +11,7 @@
 #   可传入 host 参数使命令通过 ssh 在远端执行（见 README 中的说明）。
 # - 安全性：只允许执行登记在各类别字典中的命令，所有��部参数会做严格的 token 校验，禁止任意 shell 注入。
 #
-# 注意（中文）：
+# 注意：
 # - 远端执行是可选且默认关闭的功能。若未配置 .env 或 ALLOW_REMOTE_EXEC=false，所有命令在本机执行。
 # - 请务必谨慎设置 REMOTE_ALLOWED_HOSTS、REMOTE_SSH_KEY、REMOTE_SSH_USER 等，参见 README 的安全建议。
 

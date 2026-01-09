@@ -1,11 +1,5 @@
 {
   "enabled": [
-    "container_check",
-    "control_center",
-    "files_query",
-    "process_check",
-    "prometheus",
-    "service_check",
-    "system_status"
+    "jenkins_tools"
   ]
 }

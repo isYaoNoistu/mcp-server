@@ -1,3 +1,129 @@
+# MCP Server 测试指引
+
+说明（重要）
+- 在使用任何 tools/list 或 tools/call 之前，必须先对 MCP Server 调用 `initialize` 方法（一次就行，服务重启后需要再次调用）。
+- 如果收到错误 "Server not initialized"，表示尚未执行 initialize。
+
+前置条件
+1. 确保 mcp-server 已启动并监听（例如：`http://127.0.0.1:8000/mcp`）。
+3. 若遇到 “Failed to parse request JSON” 错误，通常是 JSON 格式或引号问题，见下面“调试提示”。
+
+## 一、检查服务与健康
+目标：确认服务已启动并能访问
+验证点：HTTP 200 /health 返回 { "status":"ok", "initialized": <bool> }
+
+Linux (curl):
+```bash
+curl -sS http://127.0.0.1:8000/health | jq .
+```
+
+## 二、初始化（必须步骤）
+目标：调用 JSON-RPC initialize 方法，标记服务为已初始化
+说明：只需调用一次（每次服务重启后需重新调用）
+
+Linux (curl):
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | jq .
+```
+
+验证点（中文）：
+- 返回应是 JSON-RPC 的响应，表示初始化成功（protocolVersion、capabilities 等信息）。
+- 初始化后，`/health` 中的 `initialized` 会为 true（取决实现）。
+
+## 三、查看已启用工具（tools/list）
+目标：获取当前“已启用”工具列表（前端展示用）
+说明：此调用要要求服务已初始化
+
+Linux (curl):
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | jq .
+```
+
+验证点（中文）：
+- 输出包含 "tools" 字段，里面是被启用工具的数组（每项含 name/description/inputSchema）。
+- 被 .env 或 control_center 禁用的工具不应出现在此列表。
+
+## 四、列出所有已注册工具及启用状态（control_center action=list）
+目标：管理员查看全部工具及 enabled 状态（包含禁用的）
+说明：control_center 本身必须是启用状态，否则无法调用
+
+Linux (curl):
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":3,"method":"tools/call",
+    "params": {"name":"control_center","arguments":{"action":"list"}}
+  }' | jq .
+```
+
+验证点（中文）：
+- 返回 Markdown 文本（content[0].text）或 JSON，内含每个工具的 enabled 状态（true/false）。
+- 可用作管理员查看/同步 .env 与 .tool_state.json 状态。
+
+## 五、通过 control_center 启用/禁用工具（示例）
+目标：演示 enable/disable 并即时生效（写入 .tool_state.json）
+
+禁用示例（disable container_check）Linux:
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":4,"method":"tools/call",
+    "params": {"name":"control_center","arguments":{"action":"disable","name":"container_check"}}
+  }' | jq .
+```
+
+验证点（中文）：
+- 返回表示禁用成功（例如 "Disabled tool 'container_check': True"）。
+- 立即再执行 tools/list，确认对应工具已从列表移除。
+
+## 六、调用具体工具示例（prometheus）
+说明：确保 prometheus 在 .env 已配置并启用
+
+Linux (curl):
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":5,"method":"tools/call",
+    "params": {"name":"prometheus","arguments":{"query":"up","time_range":"5m","step":"30s"}}
+  }' | jq .
+```
+
+验证点（中文）：
+- 若 Prometheus 可达并启用：返回的 content[0].text 应包含指标结果（Markdown 表格或文本）。
+- 若工具被禁用：返回 JSON-RPC 错误，message 中通常写 "Tool not enabled" 或 "Tool not found"。
+- 若配置错误或网络问题：工具返回以 `Error:` 开头的字符串说明。
+
+## 七、查看 .tool_state.json（持久化文件）
+目标：确认 enable/disable 操作写入或 .env 覆盖后的最终状态
+
+Linux:
+```bash
+cat .tool_state.json | jq .
+```
+
+验证点（中文）：
+- JSON 中 "enabled" 数组应该反映当前已启用工具的 canonical names。
+
+## 附：建议的测试顺序（最少步骤）
+
+1. 启动 mcp-server 或确认已运行。
+2. health 检查（/health）。
+3. initialize 调用（必须）。
+4. tools/list（确认可用工具）。
+5. control_center list（确认 enabled 状态）。
+6. 通过 control_center 禁用/启用某工具并再次验证 tools/list。
+7. 调用某具体工具（如 prometheus）验证返回结果。
+8. 检查 .tool_state.json 持久化。
+
+
+
 # MCP 可执行命令清单
 
 docker_tools、system_ckeck
@@ -45,8 +171,6 @@ docker_tools、system_ckeck
 |                                      |      pstree      |                     `pstree -p`                      |         树形结构显示进程（包含 PID）         |                           无                            |
 |                                      |    journalctl    |        `journalctl -n 50 --no-pager -o json`         |     查看最后 50 条系统日志（JSON 格式）      |                           无                            |
 |                                      |       tail       |               `tail -n <lines> <path>`               |          查看文件末尾指定行数的内容          | path（必填 str，文件路径）、lines（可选 int，默认 100） |
-
-
 
 
 

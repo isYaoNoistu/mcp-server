@@ -1,11 +1,4 @@
 # core/registry.py
-# Extended registry with runtime enable/disable control and .env-based startup overrides.
-# - register_tool(tool): registers tool objects (name + aliases) into the internal all-tools map.
-# - load_tools(): registers tools and applies .env overrides after registration.
-# - list_tools(): returns only ENABLED unique tool objects (for mcp_server tools/list).
-# - call_tool(name, params): will only call tool when it is enabled.
-# - enable_tool(name_or_alias) / disable_tool(name_or_alias) / is_enabled(name_or_alias)
-# - persisted state stored in <repo_root>/.tool_state.json
 
 import pkgutil
 import importlib
@@ -53,6 +46,16 @@ def _load_state() -> None:
         # ignore parse errors
         pass
 
+def _val_truth(v: Optional[str]) -> Optional[bool]:
+    if v is None:
+        return None
+    vv = str(v).strip().lower()
+    if vv in ("1", "true", "yes", "y", "on"):
+        return True
+    if vv in ("0", "false", "no", "n", "off"):
+        return False
+    return None
+
 def _apply_env_overrides_after_registration() -> None:
     """
     Apply .env overrides to enabled/disabled tools.
@@ -62,24 +65,14 @@ def _apply_env_overrides_after_registration() -> None:
       - <CANONICAL_NAME>=0/1
       - <CANONICAL_NAME>_TOOL=0/1
 
-    Value truthiness: 1/true/yes/on/y => enable; 0/false/no/off/n => disable.
+    Value truthiness: 1/true/yes/on => enable; 0/false/no/off => disable.
 
-    This function is called after all tools have been registered, so canonical names are known.
-    After applying overrides, persist the effective state to .tool_state.json.
+    Called after all tools have been registered, so canonical names are known.
+    Persists final state to .tool_state.json.
     """
     all_env = cfg_as_dict()  # includes environment variables and .env file entries
     # Build set of known canonical names (uppercased for matching)
     known = {getattr(t, "name", "").upper(): getattr(t, "name", "") for t in set(_ALL_TOOL_REGISTRY.values())}
-
-    def _val_truth(v: str) -> Optional[bool]:
-        if v is None:
-            return None
-        vv = str(v).strip().lower()
-        if vv in ("1", "true", "yes", "y", "on"):
-            return True
-        if vv in ("0", "false", "no", "n", "off"):
-            return False
-        return None
 
     modified = False
     for k, v in all_env.items():
@@ -119,7 +112,7 @@ def _apply_env_overrides_after_registration() -> None:
     if modified:
         _persist_state()
 
-# Load persisted state (if any) at import time. It will be potentially overridden by .env in load_tools()
+# Load persisted state on import (if exists)
 _load_state()
 
 def register_tool(tool: Any) -> None:
@@ -128,7 +121,10 @@ def register_tool(tool: Any) -> None:
     A tool object must have:
       - name: str
       - aliases: optional list[str]
-    Registration will not necessarily make it callable unless enabled.
+    Behavior:
+      - If a persisted .tool_state.json existed and listed enabled tools, those stay enabled.
+      - New tools are auto-enabled by default (we add canonical name to _ENABLED_TOOLS),
+        unless ALLOW_AUTO_ENABLE_NEW_TOOLS is set to a falsy value in .env.
     """
     # register canonical name
     _ALL_TOOL_REGISTRY[tool.name] = tool
@@ -140,15 +136,29 @@ def register_tool(tool: Any) -> None:
             continue
         _ALL_TOOL_REGISTRY[a] = tool
 
-    # If persisted state loaded earlier includes this tool -> keep it
-    # If persisted state not loaded (empty), default-enable new tools
-    if _ENABLED_TOOLS:
-        # if canonical name already present, no-op
-        pass
-    else:
-        _ENABLED_TOOLS.add(tool.name)
-        # persist default state
-        _persist_state()
+    # Determine whether to auto-enable new tools
+    # Default behavior: auto-enable new tools on startup for convenience
+    # But allow override via .env: ALLOW_AUTO_ENABLE_NEW_TOOLS=false
+    allow_auto_env = cfg_get("ALLOW_AUTO_ENABLE_NEW_TOOLS")
+    allow_auto = True if _val_truth(allow_auto_env) is None else bool(_val_truth(allow_auto_env))
+
+    # If the tool is not present in persisted state, and auto-enable is allowed, enable it
+    canon = getattr(tool, "name", None)
+    if canon:
+        if canon not in _ENABLED_TOOLS and allow_auto:
+            _ENABLED_TOOLS.add(canon)
+            _persist_state()
+        # if allow_auto is False and _ENABLED_TOOLS is non-empty (persisted state existed),
+        # do not auto-add the new tool (conservative behavior).
+
+def apply_env_overrides() -> None:
+    """
+    Public wrapper to re-apply .env overrides at runtime.
+    This will read .env (via tools.config) and apply TOOL_* keys,
+    then persist the effective state to .tool_state.json.
+    Useful for applying .env without restarting the server.
+    """
+    _apply_env_overrides_after_registration()
 
 def _canonical_name_for(name_or_alias: str) -> Optional[str]:
     """
