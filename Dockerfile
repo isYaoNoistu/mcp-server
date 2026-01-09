@@ -1,6 +1,9 @@
 # Simple, production-ready Dockerfile for the mcp-server FastAPI app.
 # Build: docker build -t mcp-server:latest .
 # Run:   docker run -p 8000:8000 --name mcp-server mcp-server:latest
+
+# 提示：若使用docker镜像启动服务，则部分mcp功能会失效，后续会适配处理
+
 FROM python:3.11-slim
 
 # Keep Python output unbuffered (helpful for logs)
