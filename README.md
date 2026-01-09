@@ -13,11 +13,13 @@
 
 - `read_file`：读取指定的系统文件文件（初期测试使用）。
 
-- `prometheus`：基于dify-plugin-prometheus二次开发，仅保留AI调用Prometheus功能，移除kubernetes逻辑。
+- `prometheus_tools`：基于dify-plugin-prometheus二次开发，仅保留AI调用Prometheus功能，移除kubernetes逻辑。
 
 - `files_query`：定义可以访问的目录，该目录下所有文件可查看。
 
-- `command_tools(system_check)`：定义一部分常用系统运维命令，AI可调用命令查询系统状态等等。
+- `system_check_tools`：定义一部分常用系统运维命令，AI可调用命令查询系统状态等等。
+
+- `docker_tools`：定义docker相关查询信息，AI可调用命令查询docker容器状态、镜像等等。
 ------
 
 ## 设计原则
@@ -61,7 +63,8 @@ mcp-server/
 │   └── read_files.py          # 查询Linux文件的mcp工具
 │   └── prometheus_tools.py    # 查询Prometheus的mcp工具
 │   └── files_query.py         # 文件查询的mcp工具
-│   └── command_tools.py       # 常用系统检查命令的mcp工具
+│   └── system_check_tools.py  # 常用系统检查命令的mcp工具
+│   └── docker_tools.py        # docker常用命令的mcp工具
 │
 └── cherry/                    # Cherry Studio 专用
     └── cherry_mcp.json        # Cherry Studio 导入配置 
