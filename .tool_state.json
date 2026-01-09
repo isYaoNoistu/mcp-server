@@ -1,5 +1,5 @@
 {
   "enabled": [
-    "jenkins_tools"
+    "mysql_query"
   ]
 }
