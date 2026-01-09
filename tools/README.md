@@ -1,6 +1,6 @@
 # MCP 可执行命令清单
 
-
+docker_tools、system_ckeck
 
 
 
