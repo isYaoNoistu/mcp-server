@@ -48,9 +48,13 @@
 
 ```text
 mcp-server/
-├── mcp_server.py              # MCP 主入口（Dify / Cherry 共用）
+├── mcp_server.py              # MCP 服务器主入口
 ├── requirements.txt           # Python 依赖
 ├── README.md                  # 项目说明（本文档）
+├── start_project.sh           # 处理服务启动Python依赖与环境
+│
+├── systemd_service/
+│   └── mcp-server.service     # MCP Server 使用systemd管理启动文件示例
 │
 ├── core/                      # MCP 核心抽象
 │   ├── __init__.py
@@ -58,13 +62,19 @@ mcp-server/
 │   ├── protocol.py            # JSON-RPC / MCP 响应封装
 │   └── state.py               # Server 状态管理
 │
+├── scripts/
+│   └── add_tools.py           # MCP 工具注入.tools_state.json
+│
 ├── tools/                     # MCP 工具目录（重点）
 │   ├── __init__.py
+│   ├── config.py              # .env 配置文件加载器
+│   ├── control_center.py.py   # MCP 服务控制中心
 │   └── read_files.py          # 查询Linux文件的mcp工具
 │   └── prometheus_tools.py    # 查询Prometheus的mcp工具
 │   └── files_query.py         # 文件查询的mcp工具
 │   └── system_check_tools.py  # 常用系统检查命令的mcp工具
 │   └── docker_tools.py        # docker常用命令的mcp工具
+│   └── jenkins_tools.py       # 调用Jenkins流水线信息
 │
 └── cherry/                    # Cherry Studio 专用
     └── cherry_mcp.json        # Cherry Studio 导入配置 
