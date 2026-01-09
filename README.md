@@ -19,7 +19,7 @@
 
 - `system_check_tools`：定义一部分常用系统运维命令，AI可调用命令查询系统状态等等。
 
-- `docker_tools`：定义docker相关查询信息，AI可调用命令查询docker容器状态、镜像等等。
+- `docker_tools`：定义docker相关查询信息，AI可调用命令查询docker容器状态、镜像等。
 ------
 
 ## 设计原则
