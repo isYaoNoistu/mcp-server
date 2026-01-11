@@ -4,22 +4,26 @@
 
 本项目是一个 **MCP（Model Context Protocol）Server**，基于 **FastAPI + JSON-RPC 2.0** 实现，最初用于 **Dify 平台** 的 MCP 工具对接，在**不破坏原有核心逻辑的前提下**，通过结构化改造，实现兼容Cherry Studio。
 
-- ✅ **完整兼容 Dify MCP 接入规范**
-- ✅ **同时支持 Cherry Studio 的 JSON 导入方式**
-- ✅ **工具（Tools）模块化、可扩展**
-- ✅ **单一 Server，双平台复用（二合一）**
+- **完整兼容 Dify MCP 接入规范**
+- **支持 Cherry Studio 的 JSON 导入方式**
+- **工具（Tools）模块化、可扩展**
+- **单一 Server，双平台复用（二合一）**
 
-当前已内置工具：
+当前MCP Server可调用mcp工具如下：
 
 - `read_file`：读取指定的系统文件文件（初期测试使用）。
 
-- `prometheus_tools`：基于dify-plugin-prometheus二次开发，仅保留AI调用Prometheus功能，移除kubernetes逻辑。
+- `prometheus_tools`：基于dify-plugin-prometheus二次开发，实现AI调用Prometheus功能。
 
 - `files_query`：定义可以访问的目录，该目录下所有文件可查看。
 
 - `system_check_tools`：定义一部分常用系统运维命令，AI可调用命令查询系统状态等等。
 
 - `docker_tools`：定义docker相关查询信息，AI可调用命令查询docker容器状态、镜像等。
+
+- `jenkins_tools`：定义Jenkins相关查询信息，AI可调用命令查询jenkins流水线内容及状态等。
+
+- `mysql_query_tools`：MySQL数据库内容调用，并进行AI分析。
 ------
 
 ## 设计原则
