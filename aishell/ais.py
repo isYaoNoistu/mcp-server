@@ -7,17 +7,6 @@ import json
 import threading
 import getpass
 
-# 环境变量：
-# cat >> ~/.bashrc << 'EOF'
-# export DEEPSEEK_API_KEY="sk-xxxx"
-# export DEEPSEEK_MODEL="deepseek-chat"
-# EOF
-# source ~/.bashrc
-
-# 使用教程：
-# chmod +x ais.py
-# sudo ln -s $(pwd)/ais.py /usr/local/bin/ais
-
 
 DEEPSEEK_API_URL = "https://api.deepseek.com/v1/chat/completions"
 MODEL = os.getenv("DEEPSEEK_MODEL", "deepseek-chat")
