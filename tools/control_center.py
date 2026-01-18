@@ -20,7 +20,7 @@ from core import registry as core_registry
 class ControlCenterTool:
     name = "control_center"
     aliases = ["control.center", "tools_control"]
-    description = "Control which tools are enabled/disabled at runtime (admin)."
+    description = "在运行时控制工具的启用/禁用状态（管理员工具）"
     input_schema = {
         "type": "object",
         "properties": {

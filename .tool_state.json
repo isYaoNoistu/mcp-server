@@ -1,5 +1,6 @@
 {
   "enabled": [
-    "prometheus"
+    "docker",
+    "kafka_tools"
   ]
 }

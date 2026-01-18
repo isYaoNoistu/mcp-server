@@ -128,3 +128,11 @@ def repo_root() -> Path:
     :return: 仓库根目录的 Path 对象
     """
     return _repo_root()
+
+def clear_cache() -> None:
+    """
+    对外暴露的方法：清除配置缓存，强制下次调用 get() 时重新加载 .env 文件
+    用于配置更新后立即生效的场景
+    """
+    global _ENV_CACHE
+    _ENV_CACHE = None

@@ -1,7 +1,0 @@
-# 代表服务正常启动 对接使用8000端口
-# INFO:     Started server process [3001651]
-# INFO:     Waiting for application startup.
-# INFO:     Application startup complete.
-# INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
-
-# 该文件作为提示与服务。

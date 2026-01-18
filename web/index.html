@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP后台管理平台</title>
+    <link rel="stylesheet" href="static/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    </head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- 左侧选项栏 -->
+            <nav class="col-md-2 d-none d-md-block sidebar">
+                <div class="sidebar-sticky">
+                    <div class="sidebar-header">
+                        <h3 class="sidebar-title">MCP管理平台</h3>
+                    </div>
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#tool-management" data-tab="tool-management">
+                                <i class="fas fa-tools"></i>
+                                工具管理
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#config-tools" data-tab="config-tools">
+                                <i class="fas fa-cog"></i>
+                                配置工具
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#call-records" data-tab="call-records">
+                                <i class="fas fa-history"></i>
+                                调用记录
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#platform-usage" data-tab="platform-usage">
+                                <i class="fas fa-book"></i>
+                                平台使用
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#user-profile" data-tab="user-profile">
+                                <i class="fas fa-user"></i>
+                                个人信息
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- 右侧内容区域 -->
+            <main role="main" class="col-md-10 ml-sm-auto px-4">
+
+                <!-- 工具管理选项卡 -->
+                <div id="tool-management" class="tab-content active">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>工具管理</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="tools-list">
+                                <h3>工具状态</h3>
+                                <div class="tools-table" id="tools-table">
+                                    <!-- 工具列表将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 配置工具选项卡 -->
+                <div id="config-tools" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>配置工具</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="config-section">
+                                <h3>工具配置</h3>
+                                <p>点击工具名称右侧的配置按钮，展开配置选项：</p>
+
+                                <div id="config-list" class="config-list">
+                                    <!-- 配置列表将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 平台使用选项卡 -->
+                <div id="platform-usage" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>平台使用说明</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="usage-guide">
+                                <h3>1. MCP工具概述</h3>
+                                <p>MCP (Model Control Platform) 是一个用于管理和控制各种工具的平台，支持通过JSON-RPC协议调用各种工具。</p>
+
+                                <h3>2. 工具调用方式</h3>
+                                <p>使用CherryStudio配置文件调用MCP工具，配置文件路径：<code> cherry\cherry_mcp.json</code></p>
+                                <pre><code>{"mcpServers": {
+  "mcp-server": {
+    "type": "http",
+    "url": "http://127.0.0.1:8000/mcp"
+  }
+}
+}</code></pre>
+                                <p>将此配置文件导入CherryStudio，即可通过CherryStudio管理和调用MCP工具。</p>
+
+                                <h3>3. 工具列表</h3>
+                                <p>在工具管理页面可以查看所有可用工具及其状态，通过开关可以启用或禁用特定工具。</p>
+
+                                <h3>4. 配置说明</h3>
+                                <p>在配置工具页面可以配置各工具的参数，配置将自动保存到.env文件中。</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 调用记录选项卡 -->
+                <div id="call-records" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>调用记录</h2>
+                        </div>
+                        <div class="card-body">
+                            <!-- 调用记录列表 -->
+                            <div class="records-section">
+                                <div class="records-table-container">
+                                    <table id="call-records-table" class="records-table">
+                                        <thead>
+                                            <tr>
+                                                <th>时间</th>
+                                                <th>工具名称</th>
+                                                <th>客户端IP</th>
+                                                <th>状态</th>
+                                                <th>处理时间(ms)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="call-records-body">
+                                            <!-- 调用记录将通过JavaScript动态生成 -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 个人信息选项卡 -->
+                <div id="user-profile" class="tab-content">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>个人信息</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="profile-content">
+                                <div class="profile-section">
+                                    <h3>用户基本信息</h3>
+                                    <div class="profile-info">
+                                        <div class="profile-item">
+                                            <label>用户名:</label>
+                                            <span id="username">admin</span>
+                                        </div>
+                                        <div class="profile-item">
+                                            <label>用户角色:</label>
+                                            <span id="user-role">管理员</span>
+                                        </div>
+                                        <div class="profile-item">
+                                            <label>登录时间:</label>
+                                            <span id="login-time">2026-01-21 14:30:00</span>
+                                        </div>
+                                        <div class="profile-item">
+                                            <label>服务器IP:</label>
+                                            <span id="server-ip">127.0.0.1</span>
+                                        </div>
+                                        <div class="profile-item">
+                                            <label>服务端口:</label>
+                                            <span id="server-port">8000</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="profile-section">
+                                    <h3>安全设置</h3>
+                                    <div class="security-actions">
+                                        <button class="btn btn-primary" onclick="changePassword()">
+                                            <i class="fas fa-lock"></i> 修改密码
+                                        </button>
+                                        <button class="btn btn-secondary" onclick="logout()">
+                                            <i class="fas fa-sign-out-alt"></i> 退出登录
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="profile-section">
+                                    <h3>系统信息</h3>
+                                    <div class="system-info">
+                                        <div class="system-item">
+                                            <label>服务版本:</label>
+                                            <span id="service-version">2.0.0</span>
+                                        </div>
+                                        <div class="system-item">
+                                            <label>Python版本:</label>
+                                            <span id="python-version">3.13.0</span>
+                                        </div>
+                                        <div class="system-item">
+                                            <label>操作系统:</label>
+                                            <span id="os-info">Windows 10</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- 消息提示框 -->
+    <div id="toast" class="toast">
+        <div class="toast-content">
+            <i class="fas fa-check-circle"></i>
+            <span class="toast-text"></span>
+        </div>
+        <div class="progress"></div>
+    </div>
+
+    <script src="static/js/main.js"></script>
+</body>
+</html>

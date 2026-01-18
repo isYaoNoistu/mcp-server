@@ -36,6 +36,5 @@ USER app
 
 EXPOSE 8000
 
-# Entrypoint: run uvicorn serving the FastAPI app defined in mcp_server.py
-# Adjust --workers according to the CPU / workload; set to 1 for lower memory usage.
-CMD ["uvicorn", "mcp_server:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+# Entrypoint: run the app directly using python command
+CMD ["python", "mcp-server.py"]

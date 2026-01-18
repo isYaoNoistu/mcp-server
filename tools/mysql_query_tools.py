@@ -160,8 +160,8 @@ def _is_write_statement(sql: str) -> bool:
 
 class MySQLQueryTool:
     name = "mysql_query"
-    aliases = ["mysql", "db_query", "mysql_mcp"]
-    description = "MySQL 数据库查询工具（可选跨库/列出所有 DB，写操作受 ALLOW_DB_MUTATIONS 保护）"
+    aliases = ["mysql", "sql"]
+    description = "MySQL数据库查询工具，支持跨库查询和列出所有数据库，写操作受ALLOW_DB_MUTATIONS保护"
     input_schema = {
         "type": "object",
         "properties": {

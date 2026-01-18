@@ -5,7 +5,7 @@ FILE_PATH = r"F:\学习资料\DevOps\阶段二-Prometheus+Grafana监控体系搭
 
 class ReadFilesTool:
     name = "read_file"
-    description = "Read Files"
+    description = "文件读取工具"
     input_schema = {
         "type": "object",
         "properties": {},

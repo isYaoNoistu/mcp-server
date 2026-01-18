@@ -7,4 +7,3 @@ structlog~=25.5.0
 pandas~=2.3.3
 python-dateutil~=2.9.0.post0
 prometheus_mcp_server~=1.5.2
-prometheus_mcp_server~=1.5.2

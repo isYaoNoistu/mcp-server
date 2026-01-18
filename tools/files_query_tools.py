@@ -24,7 +24,7 @@ class FilesQueryTool:
     aliases = ["files.query", "files"]
     # 工具描述：说明工具功能
     description = (
-        "List and read files under directory configured by FILES_ROOT in .env."
+        "列出和读取由.env中FILES_ROOT配置的目录下的文件"
     )
     # 输入参数schema：定义调用工具时允许的参数格式和类型
     input_schema = {

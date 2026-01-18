@@ -87,7 +87,7 @@ class PrometheusTool:
     # 工具别名，用于兼容不同的调用方式
     aliases = ["prometheus.query"]
     # 工具描述：说明核心功能
-    description = "Query Prometheus metrics using PromQL (range query). Configured via .env. Supports instant sampling fallback."
+    description = "使用PromQL查询Prometheus指标，支持范围查询，通过.env配置，支持即时采样回退"
     # 输入参数 schema：定义调用工具时允许的参数格式和类型
     input_schema = {
         "type": "object",

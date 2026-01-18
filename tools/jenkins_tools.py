@@ -98,8 +98,8 @@ def _format_timestamp_ms(ts_ms: Optional[int]):
 
 class JenkinsTools:
     name = "jenkins_tools"
-    aliases = ["jenkins", "jenkins_mcp"]
-    description = "Jenkins 工具：ping / 列表 jobs / job 信息 / console log / recent builds（配置来自 .env）"
+    aliases = ["jenkins", "jenkins.query"]
+    description = "Jenkins工具：ping、列出jobs、job信息、控制台日志、最近构建，配置来自.env"
     input_schema = {
         "type": "object",
         "properties": {
