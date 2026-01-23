@@ -62,36 +62,30 @@ def _run_command_ssh(host: str, ssh_user: Optional[str], ssh_key: Optional[str],
     
     ssh_cmd = [ssh_bin, "-o", "BatchMode=yes", "-o", "StrictHostKeyChecking=no"]
     
-    # 处理SSH密钥：如果是完整的密钥内容，创建临时文件
+    # 处理SSH密钥：修复密钥格式问题，添加Cherry Studio适配
     temp_key_file = None
     try:
         if ssh_key and auth_method == "key":
-            # 确保密钥内容格式正确
-            # 移除首尾空白，保留中间内容（包括换行符）
-            ssh_key_content = ssh_key.strip()
-            
-            # 临时调试
-            print(f"DEBUG: ssh_key_content starts with: {ssh_key_content[:50]}", file=sys.stderr)
-            
-            # 检查是否包含完整的密钥块（BEGIN和END标记）
-            has_begin = "BEGIN" in ssh_key_content and "PRIVATE KEY" in ssh_key_content
-            has_end = "END" in ssh_key_content and "PRIVATE KEY" in ssh_key_content
-            
-            print(f"DEBUG: has_begin={has_begin}, has_end={has_end}", file=sys.stderr)
-            
-            if has_begin and has_end:
-                # 创建临时文件
+            # 简化检查：如果包含BEGIN，则认为是密钥内容
+            if "BEGIN" in ssh_key:
+                # 修复密钥格式：确保有正确的换行符
+                ssh_key_content = ssh_key
+                # 确保密钥以换行符结尾
+                if not ssh_key_content.endswith('\n'):
+                    ssh_key_content += '\n'
+                # 创建临时文件，写入密钥内容
                 import tempfile
                 import os
-                temp_key_file = tempfile.NamedTemporaryFile(mode='w', suffix='.pem', delete=False)
-                temp_key_file.write(ssh_key_content)
-                temp_key_file.close()
+                # 使用二进制模式写入，避免换行符转换问题
+                with tempfile.NamedTemporaryFile(mode='wb', suffix='.pem', delete=False) as f:
+                    f.write(ssh_key_content.encode('utf-8'))
+                    temp_key_file = f.name
                 # 设置文件权限为600（SSH要求密钥文件权限不能太高）
-                os.chmod(temp_key_file.name, 0o600)
+                os.chmod(temp_key_file, 0o600)
                 # 使用临时文件路径作为密钥文件
-                ssh_cmd += ["-i", temp_key_file.name]
+                ssh_cmd += ["-i", temp_key_file]
             else:
-                # 如果密钥格式不完整，尝试作为密钥文件路径使用
+                # 否则，假设是密钥文件路径
                 ssh_cmd += ["-i", ssh_key]
         
         if ssh_port:
@@ -235,22 +229,38 @@ class DockerTool:
         if not isinstance(params, dict):
             return "**Error:** params must be a dictionary"
 
+        # 智能解析参数：支持多种调用格式
         action = (params.get("action") or "list").lower()
         cmd_key = params.get("command")
         
-        # 处理特殊情况：当action为"list"但提供了command参数时，自动切换到"run"模式
+        # 处理特殊情况1：当action为"list"但提供了command参数时，自动切换到"run"模式
         if action == "list" and cmd_key:
             action = "run"
+        
+        # 处理特殊情况2：如果params中直接包含命令名作为键，则自动执行该命令
+        # 例如：{"docker_ps": {}}
+        direct_cmd = None
+        if action == "list" and not cmd_key:
+            for key in params:
+                if key in self._CMDS:
+                    direct_cmd = key
+                    action = "run"
+                    break
         
         if action == "list":
             return self._list_commands_markdown()
         elif action == "run":
-            if not cmd_key:
-                return "**Error:** 'command' is required when action=run"
-            named_params = params.get("params") or {}
+            # 确定要执行的命令
+            final_cmd = cmd_key or direct_cmd
+            if not final_cmd:
+                return "**Error:** Please provide a command to run, e.g., {\"action\": \"run\", \"command\": \"docker_ps\"}"
+            
+            # 获取命令参数
+            named_params = params.get("params") or params.get(final_cmd) or {}
             extra_args = params.get("extra_args") or []
             host = params.get("host")
-            return self._execute_command(cmd_key, named_params, extra_args, host)
+            
+            return self._execute_command(final_cmd, named_params, extra_args, host)
         else:
             return f"**Error:** unsupported action '{action}'"
 

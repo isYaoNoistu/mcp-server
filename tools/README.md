@@ -1,136 +1,84 @@
-# MCP Server 测试指引
+# MCP Server 工具说明
 
-说明（重要）
-- 在使用任何 tools/list 或 tools/call 之前，必须先对 MCP Server 调用 `initialize` 方法（一次就行，服务重启后需要再次调用）。
-- 如果收到错误 "Server not initialized"，表示尚未执行 initialize。
+## 工具概述
 
-前置条件
-1. 确保 mcp-server 已启动并监听（例如：`http://127.0.0.1:8000/mcp`）。
-3. 若遇到 “Failed to parse request JSON” 错误，通常是 JSON 格式或引号问题，见下面“调试提示”。
+MCP Server 提供了多种工具，用于实现不同的功能。所有工具默认关闭，需要在 .env 文件中配置启用。
 
-## 一、检查服务与健康
-目标：确认服务已启动并能访问
-验证点：HTTP 200 /health 返回 { "status":"ok", "initialized": <bool> }
+## 工具列表及说明
 
-Linux (curl):
-```bash
-curl -sS http://127.0.0.1:8000/health | jq .
-```
+### 1. read_file
+- **作用**：读取指定的系统文件（初期测试使用）
+- **使用语法**：
+  ```json
+  {
+    "jsonrpc":"2.0","id":1,"method":"tools/call",
+    "params": {"name":"read_file","arguments":{"file_path":"/path/to/file"}}
+  }
+  ```
 
-## 二、初始化（必须步骤）
-目标：调用 JSON-RPC initialize 方法，标记服务为已初始化
-说明：只需调用一次（每次服务重启后需重新调用）
-
-Linux (curl):
-```bash
-curl -sS -X POST http://127.0.0.1:8000/mcp \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | jq .
-```
-
-验证点（中文）：
-- 返回应是 JSON-RPC 的响应，表示初始化成功（protocolVersion、capabilities 等信息）。
-- 初始化后，`/health` 中的 `initialized` 会为 true（取决实现）。
-
-## 三、查看已启用工具（tools/list）
-目标：获取当前“已启用”工具列表（前端展示用）
-说明：此调用要要求服务已初始化
-
-Linux (curl):
-```bash
-curl -sS -X POST http://127.0.0.1:8000/mcp \
-  -H "Content-Type: application/json" \
-  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | jq .
-```
-
-验证点（中文）：
-- 输出包含 "tools" 字段，里面是被启用工具的数组（每项含 name/description/inputSchema）。
-- 被 .env 或 control_center 禁用的工具不应出现在此列表。
-
-## 四、列出所有已注册工具及启用状态（control_center action=list）
-目标：管理员查看全部工具及 enabled 状态（包含禁用的）
-说明：control_center 本身必须是启用状态，否则无法调用
-
-Linux (curl):
-```bash
-curl -sS -X POST http://127.0.0.1:8000/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc":"2.0","id":3,"method":"tools/call",
-    "params": {"name":"control_center","arguments":{"action":"list"}}
-  }' | jq .
-```
-
-验证点（中文）：
-- 返回 Markdown 文本（content[0].text）或 JSON，内含每个工具的 enabled 状态（true/false）。
-- 可用作管理员查看/同步 .env 与 .tool_state.json 状态。
-
-## 五、通过 control_center 启用/禁用工具（示例）
-目标：演示 enable/disable 并即时生效（写入 .tool_state.json）
-
-禁用示例（disable container_check）Linux:
-```bash
-curl -sS -X POST http://127.0.0.1:8000/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc":"2.0","id":4,"method":"tools/call",
-    "params": {"name":"control_center","arguments":{"action":"disable","name":"container_check"}}
-  }' | jq .
-```
-
-验证点（中文）：
-- 返回表示禁用成功（例如 "Disabled tool 'container_check': True"）。
-- 立即再执行 tools/list，确认对应工具已从列表移除。
-
-## 六、调用具体工具示例（prometheus）
-说明：确保 prometheus 在 .env 已配置并启用
-
-Linux (curl):
-```bash
-curl -sS -X POST http://127.0.0.1:8000/mcp \
-  -H "Content-Type: application/json" \
-  -d '{
-    "jsonrpc":"2.0","id":5,"method":"tools/call",
+### 2. prometheus_tools
+- **作用**：基于 dify-plugin-prometheus 二次开发，实现 AI 调用 Prometheus 功能
+- **使用语法**：
+  ```json
+  {
+    "jsonrpc":"2.0","id":1,"method":"tools/call",
     "params": {"name":"prometheus","arguments":{"query":"up","time_range":"5m","step":"30s"}}
-  }' | jq .
-```
+  }
+  ```
 
-验证点（中文）：
-- 若 Prometheus 可达并启用：返回的 content[0].text 应包含指标结果（Markdown 表格或文本）。
-- 若工具被禁用：返回 JSON-RPC 错误，message 中通常写 "Tool not enabled" 或 "Tool not found"。
-- 若配置错误或网络问题：工具返回以 `Error:` 开头的字符串说明。
+### 3. files_query
+- **作用**：定义可以访问的目录，该目录下所有文件可查看
+- **使用语法**：
+  ```json
+  {
+    "jsonrpc":"2.0","id":1,"method":"tools/call",
+    "params": {"name":"files_query","arguments":{"query":"file_content","path":"/path/to/directory"}}
+  }
+  ```
 
-## 七、查看 .tool_state.json（持久化文件）
-目标：确认 enable/disable 操作写入或 .env 覆盖后的最终状态
+### 4. system_check_tools
+- **作用**：定义一部分常用系统运维命令，AI 可调用命令查询系统状态等
+- **使用语法**：
+  ```json
+  {
+    "jsonrpc":"2.0","id":1,"method":"tools/call",
+    "params": {"name":"system_check_tools","arguments":{"command":"top","lines":20}}
+  }
+  ```
 
-Linux:
-```bash
-cat .tool_state.json | jq .
-```
+### 5. docker_tools
+- **作用**：定义 docker 相关查询信息，AI 可调用命令查询 docker 容器状态、镜像等
+- **使用语法**：
+  ```json
+  {
+    "jsonrpc":"2.0","id":1,"method":"tools/call",
+    "params": {"name":"docker_tools","arguments":{"action":"list","command":"ps"}}
+  }
+  ```
 
-验证点（中文）：
-- JSON 中 "enabled" 数组应该反映当前已启用工具的 canonical names。
+### 6. jenkins_tools
+- **作用**：定义 Jenkins 相关查询信息，AI 可调用命令查询 jenkins 流水线内容及状态等
+- **使用语法**：
+  ```json
+  {
+    "jsonrpc":"2.0","id":1,"method":"tools/call",
+    "params": {"name":"jenkins_tools","arguments":{"action":"get_job_status","job_name":"example-job"}}
+  }
+  ```
 
-## 附：建议的测试顺序（最少步骤）
+### 7. mysql_query_tools
+- **作用**：MySQL 数据库内容调用，并进行 AI 分析
+- **使用语法**：
+  ```json
+  {
+    "jsonrpc":"2.0","id":1,"method":"tools/call",
+    "params": {"name":"mysql_query_tools","arguments":{"query":"SELECT * FROM users LIMIT 10"}}
+  }
+  ```
 
-1. 启动 mcp-server 或确认已运行。
-2. health 检查（/health）。
-3. initialize 调用（必须）。
-4. tools/list（确认可用工具）。
-5. control_center list（确认 enabled 状态）。
-6. 通过 control_center 禁用/启用某工具并再次验证 tools/list。
-7. 调用某具体工具（如 prometheus）验证返回结果。
-8. 检查 .tool_state.json 持久化。
+## 工具详细命令清单
 
-
-
-# MCP 可执行命令清单
-
-docker_tools、system_ckeck
-
-
-
-## docker_tools:
+### docker_tools 命令清单
 
 |          命令标识          |              对应的原生 Docker 命令              |                         功能说明                         |                   所需参数                    |
 | :------------------------: | :----------------------------------------------: | :------------------------------------------------------: | :-------------------------------------------: |
@@ -147,11 +95,7 @@ docker_tools、system_ckeck
 |      `docker_volumes`      |     `docker volume ls --format "{{json .}}"`     |       列出所有 Docker 卷，输出每行 JSON 格式的数据       |                      无                       |
 |  `docker_volume_inspect`   |         `docker volume inspect <volume>`         |         根据卷名称 / ID 查看 Docker 卷的详细配置         |          `volume`（必填，卷名 / ID）          |
 
-
-
-## system_check:
-
-
+### system_check_tools 命令清单
 
 |               工具类别               |     命令标识     |                   对应原生系统命令                   |                   功能说明                   |                        所需参数                         |
 | :----------------------------------: | :--------------: | :--------------------------------------------------: | :------------------------------------------: | :-----------------------------------------------------: |
@@ -172,15 +116,111 @@ docker_tools、system_ckeck
 |                                      |    journalctl    |        `journalctl -n 50 --no-pager -o json`         |     查看最后 50 条系统日志（JSON 格式）      |                           无                            |
 |                                      |       tail       |               `tail -n <lines> <path>`               |          查看文件末尾指定行数的内容          | path（必填 str，文件路径）、lines（可选 int，默认 100） |
 
+## 测试使用语法
 
+### 1. 检查服务与健康
+目标：确认服务已启动并能访问
 
+```bash
+curl -sS http://127.0.0.1:8000/health | jq .
+```
 
+### 2. 初始化（必须步骤）
+目标：调用 JSON-RPC initialize 方法，标记服务为已初始化
 
-# 新增工具流程
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}' | jq .
+```
 
-回答是的，你的理解基本正确。下面把整个流程、注意事项、测试步骤和最佳实践整理成一份清晰的指南（中文），方便你下次新增工具时参考并避免常见坑。
+### 3. 查看已启用工具
+目标：获取当前“已启用”工具列表
 
-一、总体流程（新增工具 -> 启用/禁用）
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | jq .
+```
+
+### 4. 列出所有已注册工具及启用状态
+目标：管理员查看全部工具及 enabled 状态（包含禁用的）
+
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":3,"method":"tools/call",
+    "params": {"name":"control_center","arguments":{"action":"list"}}
+  }' | jq .
+```
+
+### 5. 通过 control_center 启用/禁用工具
+目标：演示 enable/disable 并即时生效
+
+禁用示例：
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":4,"method":"tools/call",
+    "params": {"name":"control_center","arguments":{"action":"disable","name":"container_check"}}
+  }' | jq .
+```
+
+启用示例：
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":5,"method":"tools/call",
+    "params": {"name":"control_center","arguments":{"action":"enable","name":"container_check"}}
+  }' | jq .
+```
+
+### 6. 调用具体工具示例
+
+Prometheus 工具示例：
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":6,"method":"tools/call",
+    "params": {"name":"prometheus","arguments":{"query":"up","time_range":"5m","step":"30s"}}
+  }' | jq .
+```
+
+Docker 工具示例：
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":7,"method":"tools/call",
+    "params": {"name":"docker_tools","arguments":{"action":"run","command":"ps"}}
+  }' | jq .
+```
+
+System Check 工具示例：
+```bash
+curl -sS -X POST http://127.0.0.1:8000/mcp \
+  -H "Content-Type: application/json" \
+  -d '{
+    "jsonrpc":"2.0","id":8,"method":"tools/call",
+    "params": {"name":"system_check_tools","arguments":{"command":"top","lines":10}}
+  }' | jq .
+```
+
+## 注意事项
+
+- **SSH远程连接功能**：当前SSH远程连接功能暂时无法使用，正在修复中。
+- 所有工具默认关闭，需要在 .env 文件中配置启用。
+- 建议只在安全的内网环境中使用，特别是命令执行相关工具。
+- 修改 .env 文件后需要重启 MCP Server 才能生效。
+- 使用 control_center 修改工具状态会立即生效并写入 .tool_state.json，但下次重启若 .env 对同一工具有设置，会以 .env 为准覆盖该值。
+
+## 新增工具流程
+
+### 一、总体流程（新增工具 -> 启用/禁用）
 1. 在 tools/ 目录新增工具模块文件（例如 tools/example_tool.py）。
 2. 在模块内实现工具类并导出 module-level 的 tool 对象：
    - 必需属性/方法：
@@ -195,53 +235,11 @@ docker_tools、system_ckeck
      - 在仓库根 .env 加入 TOOL_<CANONICAL_NAME>=1（或 ENABLE_TOOL_<CANONICAL_NAME>=1 或 大写 CANONICAL_NAME=1）
      - 重启服务以让 .env 在 load_tools 阶段覆盖持久化状态。
    - 或 运行时通过 control_center（即时生效）
-     - 调用 tools/call name=control_center, arguments={"action":"enable","name":"<tool_name>"}
+     - 调用 tools/call name=control_center arguments={"action":"enable","name":"<tool_name>"}
      - control_center 会把变更写入 .tool_state.json（持久化），立即生效。
 6. 验证：用 tools/list 查看当前“已启用”的工具；或用 control_center action=list 查看所有工具及 enabled 状态。
 
-二、.env 与 .tool_state.json 的优先级与行为
-- .tool_state.json：runtime 的持久化存储（control_center enable/disable 会写入它）。
-- .env：启动时的“声明式”配置。load_tools() 在导入所有工具并从 .tool_state.json 恢复后，会应用 .env 的覆盖规则（.env 优先于 .tool_state.json），并把结果持久化回 .tool_state.json。
-- 启动顺序与效果：
-  - 修改 .env 后需要重启 mcp-server 才会被读取并覆盖当前状态（除非你使用 control_center 的 apply_env 功能来在运行时重新读取并应用 .env）。
-  - 使用 control_center 修改会立即生效并写入 .tool_state.json，但下次重启若 .env 对同一工具有设置，会以 .env 为准覆盖该值。
-- 建议：
-  - 想要“长期默认状态”就同步修改 .env（部署时由运维设置）；临时调整用 control_center（例如排障时）。
-
-三、新增工具时的注意事项（避免常见问题）
-1. name 唯一：确保 tool.name 与其它已存在工具不冲突（包含大小写一致性）。
-2. 返回类型：run 必须返回字符串（Markdown 或错误字符串）。否则 mcp-server 会把它放进 content.text 导致类型校验错误。
-3. input_schema：推荐提供，便于在 tools/list 与前端展示参数说明。
-4. aliases：如需兼容多种调用名可设置 aliases 列表。
-5. 模块导出：必须有 module-level `tool` 变量（示例：tool = ExampleTool()）。
-6. 如果工具依赖外部二进制（如 docker/iostat），建议在 run 中检查二进制是否存在，返回友好错误信息。
-7. 若工具需要读取仓库配置，使用 tools.config.get() 读取 .env 配置。
-
-四、测试步骤（新增工具后的验证）
-假设新工具 canonical name 为 example_tool：
-1. 把文件放到 tools/example_tool.py 并提交。
-2. （声明式启动）编辑 .env，加入：
-   TOOL_EXAMPLE_TOOL=1
-   或 TOOL_EXAMPLE=1（取决于 canonical name）
-3. 重启 mcp-server。
-4. 验证：
-   - 查看所有已启用工具（tools/list）：
-     curl -X POST http://127.0.0.1:8000/mcp -H 'Content-Type: application/json' -d '{
-       "jsonrpc":"2.0","id":1,"method":"tools/list","params": {}
-     }'
-     -> 结果应包含 example_tool。
-   - 使用 control_center 查看全部工具状态（包含被禁用的）：
-     调用 tools/call name=control_center arguments={"action":"list"}，观察 example_tool 的 enabled 字段。
-   - 直接调用新工具：
-     curl ... tools/call name=example_tool arguments={"query":...}（根据 input_schema 调用）
-   - 查看 .tool_state.json 内容确认已包含 example_tool（或其启用/禁用状态）。
-
-五、如果你不想重启也要用 .env 生效
-- 如果不想重启服务，可用 control_center 的 apply_env（若你已加上此功能）在运行时重新读取 .env 并应用，这会写回 .tool_state.json 并立即生效：
-  调用 tools/call name=control_center arguments={"action":"apply_env"}。
-
-六、示例模板（新增工具文件示例）
-把下面模板按需修改并保存为 tools/example_tool.py：
+### 二、示例模板（新增工具文件示例）
 
 ```python
 class ExampleTool:
@@ -268,4 +266,3 @@ class ExampleTool:
 # 模块级导出，load_tools 会注册这个 tool
 tool = ExampleTool()
 ```
-

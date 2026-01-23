@@ -1,0 +1,538 @@
+[
+  {
+    "timestamp": "2026-01-23T03:27:41.970712+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.00031,
+    "details": "**Error:** unknown docker command 'ps'"
+  },
+  {
+    "timestamp": "2026-01-23T03:27:42.282427+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000433,
+    "details": "**Error:** unknown docker command 'stats'"
+  },
+  {
+    "timestamp": "2026-01-23T03:27:42.727132+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000361,
+    "details": "**Error:** unknown docker command 'events'"
+  },
+  {
+    "timestamp": "2026-01-23T03:27:45.217775+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.001503,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:28:14.370362+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.077198,
+    "details": "| __name__ | app | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- | --- |\n| up | prometheus |  | localhost:9090 | prometheus | 1 | 2026-01-23T03:28:14.293000Z |\n| up |  | pr"
+  },
+  {
+    "timestamp": "2026-01-23T03:28:15.063398+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.106704,
+    "details": "| instance | value | time |\n| --- | --- | --- |\n| 192.168.119.2:9100 | 9.615641042888313 | 2026-01-23T03:28:14.956000Z |"
+  },
+  {
+    "timestamp": "2026-01-23T03:28:15.679336+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.0832,
+    "details": "| env | instance | job | value | time |\n| --- | --- | --- | --- | --- |\n| prod | 192.168.119.2:9100 | node_exporter | 67.43984194070853 | 2026-01-23T03:28:15.596000Z |"
+  },
+  {
+    "timestamp": "2026-01-23T03:28:16.485148+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.079107,
+    "details": "| device | env | fstype | instance | job | mountpoint | value | time |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| /dev/mapper/cl-home | prod | xfs | 192.168.119.2:9100 | node_exporter | /app "
+  },
+  {
+    "timestamp": "2026-01-23T03:28:16.832432+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.070767,
+    "details": "| __name__ | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| node_load1 | prod | 192.168.119.2:9100 | node_exporter | 5.23 | 2026-01-23T03:28:16.761000Z |"
+  },
+  {
+    "timestamp": "2026-01-23T03:28:17.344740+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.07888,
+    "details": "| device | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| docker0 | prod | 192.168.119.2:9100 | node_exporter | 247361.35742382825 | 2026-01-23T03:28:17.266000Z |\n| eno1"
+  },
+  {
+    "timestamp": "2026-01-23T03:28:17.854248+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.11153,
+    "details": "| device | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| docker0 | prod | 192.168.119.2:9100 | node_exporter | 5251.150076671778 | 2026-01-23T03:28:17.742000Z |\n| eno1n"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:21.353864+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.464397,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:22.047966+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.474763,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:22.536710+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.469889,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:23.009618+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.453829,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:23.497790+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.470849,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:23.938954+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.422852,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:24.054297+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.094876,
+    "details": "| __name__ | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| redis_connected_clients | prod-redis | prod-redis | redis_exporter | 140 | 2026-01-23T03:29:23.959000Z |"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:24.522975+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.465812,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:24.939802+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.395268,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:25.375427+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.404008,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:27.178385+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.075548,
+    "details": "| __name__ | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| mysql_up | prod | prod-mysql | mysqld_exporter | 1 | 2026-01-23T03:29:27.102000Z |"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:27.863702+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.409728,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:27.938073+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.059657,
+    "details": "| __name__ | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| redis_up | prod-redis | prod-redis | redis_exporter | 1 | 2026-01-23T03:29:27.878000Z |"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:28.200996+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.067767,
+    "details": "| __name__ | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| redis_memory_used_bytes | prod-redis | prod-redis | redis_exporter | 368697288 | 2026-01-23T03:29:28.133000Z "
+  },
+  {
+    "timestamp": "2026-01-23T03:29:28.580531+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.062222,
+    "details": "| __name__ | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| redis_commands_processed_total | prod-redis | prod-redis | redis_exporter | 1596797435 | 2026-01-23T03:29:28."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:29.414193+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.434442,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:29.902545+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.429167,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:32.635933+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.06808,
+    "details": "| __name__ | db | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- | --- |\n| redis_db_keys | db0 | prod-redis | prod-redis | redis_exporter | 180433 | 2026-01-23T03:29:32.5670"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:33.026061+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.071893,
+    "details": "| __name__ | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| redis_expired_keys_total | prod-redis | prod-redis | redis_exporter | 433054 | 2026-01-23T03:29:32.954000Z |"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:33.441503+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.059173,
+    "details": "| __name__ | env | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- |\n| redis_evicted_keys_total | prod-redis | prod-redis | redis_exporter | 0 | 2026-01-23T03:29:33.382000Z |"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:34.855892+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 1.112533,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:35.341661+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.460421,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:35.806673+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.462058,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:37.231059+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.09027,
+    "details": "| __name__ | consumergroup | env | instance | job | partition | topic | value | time |\n| --- | --- | --- | --- | --- | --- | --- | --- | --- |\n| kafka_consumergroup_lag | iot-data-msg-consumer-YKC1 | "
+  },
+  {
+    "timestamp": "2026-01-23T03:29:37.617742+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.056303,
+    "details": "| __name__ | address | env | id | instance | job | value | time |\n| --- | --- | --- | --- | --- | --- | --- | --- |\n| kafka_broker_info | 119.48.130.131:9192 | prod-kafka | 1 | prod-kafka | Kafka_Prod"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:38.056491+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "success",
+    "process_time": 0.075879,
+    "details": "| __name__ | env | instance | job | topic | value | time |\n| --- | --- | --- | --- | --- | --- | --- |\n| kafka_topic_partitions | prod-kafka | prod-kafka | Kafka_Prod_exporter | __consumer_offsets | 5"
+  },
+  {
+    "timestamp": "2026-01-23T03:29:38.934559+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.430093,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:29:39.463983+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.469822,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:32:50.756513+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000307,
+    "details": "**Error:** unknown docker command 'ps'"
+  },
+  {
+    "timestamp": "2026-01-23T03:32:52.046226+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.001471,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:32:56.439177+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.424567,
+    "details": "**Command:** `ssh 120.48.58.4 docker ps -a --format '{{json .}}'`\n\n**Exit code:** 255\n\n**Stdout:**\n```\n[]\n```\n**Stderr:**\n```\nWarning: Identity file -----BEGIN RSA PRIVATE KEY----- not accessible: No "
+  },
+  {
+    "timestamp": "2026-01-23T03:32:59.559827+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.413784,
+    "details": "**Command:** `ssh 120.48.58.4 docker images -a --format '{{json .}}'`\n\n**Exit code:** 255\n\n**Stdout:**\n```\n[]\n```\n**Stderr:**\n```\nWarning: Identity file -----BEGIN RSA PRIVATE KEY----- not accessible:"
+  },
+  {
+    "timestamp": "2026-01-23T03:33:06.189681+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 4.150865,
+    "details": "**Command:** `ssh localhost docker ps -a --format '{{json .}}'`\n\n**Exit code:** 255\n\n**Stdout:**\n```\n[]\n```\n**Stderr:**\n```\nWarning: Identity file -----BEGIN RSA PRIVATE KEY----- not accessible: No su"
+  },
+  {
+    "timestamp": "2026-01-23T03:33:14.291037+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.468401,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:33:17.099473+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "prometheus",
+    "status": "error",
+    "process_time": 0.477536,
+    "details": "No data obtained via instant sampling fallback."
+  },
+  {
+    "timestamp": "2026-01-23T03:38:09.066681+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000682,
+    "details": "**Error:** unknown docker command 'ps'"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:10.417408+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.001879,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:12.772401+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.425634,
+    "details": "**Command:** `ssh 120.48.58.4 docker ps -a --format '{{json .}}'`\n\n**Exit code:** 255\n\n**Stdout:**\n```\n[]\n```\n**Stderr:**\n```\nLoad key \"C:\\\\Users\\\\15509\\\\AppData\\\\Local\\\\Temp\\\\tmpfqg8zber.pem\": invali"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:21.619343+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000789,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:24.915561+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000659,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:26.473858+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000533,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:28.278108+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000541,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:29.834211+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000543,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:31.609666+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.00061,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:38:33.208413+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000667,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:42:01.288974+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000778,
+    "details": "**Error:** unknown docker command 'images'"
+  },
+  {
+    "timestamp": "2026-01-23T03:42:04.435462+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000813,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:42:06.265548+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.42747,
+    "details": "**Command:** `ssh 120.48.58.4 docker images -a --format '{{json .}}'`\n\n**Exit code:** 255\n\n**Stdout:**\n```\n[]\n```\n**Stderr:**\n```\nLoad key \"C:\\\\Users\\\\15509\\\\AppData\\\\Local\\\\Temp\\\\tmpxcqiqxnj.pem\": in"
+  },
+  {
+    "timestamp": "2026-01-23T03:44:11.447287+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.000764,
+    "details": "# Docker Inspection Commands\n\n- **docker_container_inspect**: Inspect a container by name or ID  \n  params: container (required)\n- **docker_container_logs**: Fetch logs from a container  \n  params: co"
+  },
+  {
+    "timestamp": "2026-01-23T03:44:13.815650+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.794295,
+    "details": "**Command:** `ssh 120.48.58.4 docker images -a --format '{{json .}}'`\n\n**Exit code:** 255\n\n**Stdout:**\n```\n[]\n```\n**Stderr:**\n```\nLoad key \"C:\\\\Users\\\\15509\\\\AppData\\\\Local\\\\Temp\\\\tmpc3v6mhe9.pem\": in"
+  },
+  {
+    "timestamp": "2026-01-23T03:44:18.442954+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.396732,
+    "details": "**Command:** `ssh 120.48.58.4 docker ps -a --format '{{json .}}'`\n\n**Exit code:** 255\n\n**Stdout:**\n```\n[]\n```\n**Stderr:**\n```\nLoad key \"C:\\\\Users\\\\15509\\\\AppData\\\\Local\\\\Temp\\\\tmpstopia02.pem\": invali"
+  },
+  {
+    "timestamp": "2026-01-23T03:44:20.080306+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "docker",
+    "status": "success",
+    "process_time": 0.417561,
+    "details": "**Command:** `ssh 120.48.58.4 docker network ls --format '{{json .}}'`\n\n**Exit code:** 255\n\n**Stdout:**\n```\n[]\n```\n**Stderr:**\n```\nLoad key \"C:\\\\Users\\\\15509\\\\AppData\\\\Local\\\\Temp\\\\tmpdwiq8d6c.pem\": i"
+  },
+  {
+    "timestamp": "2026-01-23T03:44:24.902107+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "service_check",
+    "status": "success",
+    "process_time": 0.000616,
+    "details": "# service_check - 可用命令\n\n- **journalctl**: 最近系统日志（JSON 格式）（journalctl -n 50 -o json）  \n  参数: 无\n- **ps_defunct**: 查找僵尸进程（stat 包含 Z 或命令中含 defunct）  \n  参数: 无\n- **pstree**: 进程树（pstree -p），显示父子关系与 PID  \n  参"
+  },
+  {
+    "timestamp": "2026-01-23T03:44:32.404826+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "service_check",
+    "status": "success",
+    "process_time": 0.000622,
+    "details": "# service_check - 可用命令\n\n- **journalctl**: 最近系统日志（JSON 格式）（journalctl -n 50 -o json）  \n  参数: 无\n- **ps_defunct**: 查找僵尸进程（stat 包含 Z 或命令中含 defunct）  \n  参数: 无\n- **pstree**: 进程树（pstree -p），显示父子关系与 PID  \n  参"
+  },
+  {
+    "timestamp": "2026-01-23T03:44:33.718382+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "service_check",
+    "status": "success",
+    "process_time": 0.000629,
+    "details": "# service_check - 可用命令\n\n- **journalctl**: 最近系统日志（JSON 格式）（journalctl -n 50 -o json）  \n  参数: 无\n- **ps_defunct**: 查找僵尸进程（stat 包含 Z 或命令中含 defunct）  \n  参数: 无\n- **pstree**: 进程树（pstree -p），显示父子关系与 PID  \n  参"
+  },
+  {
+    "timestamp": "2026-01-23T03:44:35.398089+00:00",
+    "client_ip": "127.0.0.1",
+    "tool_name": "service_check",
+    "status": "success",
+    "process_time": 0.000505,
+    "details": "# service_check - 可用命令\n\n- **journalctl**: 最近系统日志（JSON 格式）（journalctl -n 50 -o json）  \n  参数: 无\n- **ps_defunct**: 查找僵尸进程（stat 包含 Z 或命令中含 defunct）  \n  参数: 无\n- **pstree**: 进程树（pstree -p），显示父子关系与 PID  \n  参"
+  }
+]

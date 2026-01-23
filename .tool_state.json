@@ -1,6 +1,11 @@
 {
   "enabled": [
+    "disk_io_check",
     "docker",
-    "kafka_tools"
+    "kafka_tools",
+    "process_check",
+    "prometheus",
+    "service_check",
+    "system_status"
   ]
 }
