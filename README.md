@@ -292,9 +292,28 @@ Dify
 
 ### 1. 安装依赖
 
+#### 标准PyPI依赖
+
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
+
+#### 非标准依赖（可选）
+
+项目中还使用了一些非标准PyPI包，这些包可能需要额外的安装步骤：
+
+- `fastmcp`
+- `prometheus_mcp_server`
+- `jenkins_mcp_enterprise`
+
+这些包可能是内部定制包或尚未发布到PyPI的包，您可以根据需要选择安装。如果不需要相关功能，可以忽略这些依赖。
+
+#### 注意事项
+
+- 在Windows环境中，建议使用`python -m pip`代替直接使用`pip`
+- 如果遇到安装问题，可以尝试使用`--trusted-host`参数或更换PyPI源
+- 对于MySQL相关功能，需要安装`pymysql`或`mysql-connector-python`中的至少一个
+- 对于SSH远程连接功能，需要安装`paramiko`库
 
 ### 2. 启动服务
 
